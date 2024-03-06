@@ -1,0 +1,36 @@
+.container{
+  width: 800px;
+  font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #F6F6F6;
+  margin: 0 auto;
+}
+
+.color-title{
+  color: #15969A;
+}
+
+h1{
+  margin: 20px 30px;
+}
+
+ul{
+  display: flex;
+  margin: 0;
+}
+
+li{
+  list-style-type: none;
+  color: white;
+  font-size: 26px;
+  padding: 10px 30px;
+  &:hover{
+    border-bottom: 2px solid #15969A;
+    padding-bottom: 13px;
+  }
+}
+
+nav{
+  height: 55px;
+  background-color: #404040;
+  padding: 5px;
+}
