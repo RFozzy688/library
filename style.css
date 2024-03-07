@@ -103,7 +103,7 @@ td{
 .label-text{
   font-weight: bold;
   margin-top: 10px;
-  padding-bottom: 5px;
+  margin-bottom: 5px;
 }
 .modal-title{
   font-weight: bold;
@@ -121,5 +121,12 @@ td{
   width: 500px;
   border-radius: 5px;
   background-color: #F6F6F6;
-  padding: 40px;
+  padding: 20px 40px;
+}
+.input-box{
+  margin-top: 5px;
+}
+.warning{
+  visibility: hidden;
+  color: red;
 }
