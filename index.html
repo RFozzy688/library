@@ -9,8 +9,8 @@
   <script src="script.js" defer></script>
   <title>Library</title>
 </head>
-<body id="body">
-  <div class="container">
+<body>
+  <div id="container" class="container">
     <h1 class="color-title">LIBRARY</h1>
     <nav>
       <ul>
@@ -20,42 +20,12 @@
         <li id="pageStatistics">Statistics</li>
       </ul>
     </nav>
-    <div class="content">
-      <div class="header">
-        <h3 class="color-title">ALL BOOKS:</h3>
-        <button id="newBook" class="btn-new-book">New book</button>
-      </div>
-      <hr>
-      <div class="sort-search">
-        <div class="sort">
-          <label for="combo">Sort by:</label>
-          <select name="list" id="combo">
-            <option value="0">ID</option>
-            <option value="1">Name</option>
-            <option value="2">Author</option>
-            <option value="3">Quantity</option>
-          </select>
-          <button id="sort">Sort</button>
-        </div>
-        <div class="search">
-          <label for="searchText">Search:</label>
-          <input type="text">
-          <button id="search">Search</button>
-        </div>
-      </div>
-      <div class="list">
-        <table id="listBooks">
-          <tr>
-            <th>ID</th>
-            <th>Name book</th>
-            <th>Year of publication</th>
-            <th>Publishing house</th>
-            <th>Quantity pages</th>
-            <th>Quantity books</th>
-            <th>Edit</th>
-            <th>Delete</th>
-          </tr>
-          <!-- <tr>
+  </div>
+  <div id="modal" class="modal"></div>
+</body>
+</html>
+
+<!-- <tr>
             <td>1</td>
             <td>Complete Guide to CSS Flex & Grid - Vanilla CSS</td>
             <td>2021</td>
@@ -65,10 +35,3 @@
             <td><i class="fa fa-pencil btn" aria-hidden="true"></i></td>
             <td><i class="fa fa-trash btn" aria-hidden="true"></i></td>
           </tr> -->
-        </table>
-      </div>
-    </div>
-  </div>
-  <div id="modal" class="modal"></div>
-</body>
-</html>

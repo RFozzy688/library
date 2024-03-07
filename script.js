@@ -8,11 +8,119 @@ menuItems.forEach(item => {
   });
 });
 
-document.getElementById('newBook').addEventListener('click', function (event) { 
-  let modal = document.getElementById('modal');
-  modal.innerHTML = createModalDialogBook();
-  modal.style.display = 'block';
+document.getElementById('pageBooks').addEventListener('click', function (event) {
+  container.removeChild(content);
+
+  showPageBooks();
 });
+
+document.getElementById('pageVisitors').addEventListener('click', function (event) {
+  container.removeChild(content);
+
+  showPageVisitors();
+});
+
+showPageBooks();
+
+function showPageBooks(){
+  let newItem = document.createElement('div');
+
+  newItem.id = 'content';
+  newItem.classList.add('content');
+  newItem.innerHTML = `
+  <div class="header">
+    <h3 class="color-title">ALL BOOKS:</h3>
+    <button id="newBook" class="btn-new-book">New book</button>
+  </div>
+  <hr>
+  <div class="sort-search">
+    <div class="sort">
+      <label for="combo">Sort by:</label>
+      <select name="list" id="combo">
+        <option value="0">ID</option>
+        <option value="1">Name</option>
+        <option value="2">Author</option>
+        <option value="3">Quantity</option>
+      </select>
+      <button id="sort">Sort</button>
+    </div>
+    <div class="search">
+      <label for="searchText">Search:</label>
+      <input type="text">
+      <button id="search">Search</button>
+    </div>
+  </div>
+  <div class="list">
+    <table id="listBooks">
+      <tr>
+        <th>ID</th>
+        <th>Name book</th>
+        <th>Year of publication</th>
+        <th>Publishing house</th>
+        <th>Quantity pages</th>
+        <th>Quantity books</th>
+        <th>Edit</th>
+        <th>Delete</th>
+      </tr>          
+    </table>
+  </div>`;
+
+  container.appendChild(newItem);
+
+  document.getElementById('newBook').addEventListener('click', function (event) { 
+    let modal = document.getElementById('modal');
+    modal.innerHTML = createModalDialogBook();
+    modal.style.display = 'block';
+  });
+}
+
+function showPageVisitors(){
+  let newItem = document.createElement('div');
+
+  newItem.id = 'content';
+  newItem.classList.add('content');
+  newItem.innerHTML = `
+  <div class="header">
+    <h3 class="color-title">ALL VISITORS:</h3>
+    <button id="newVisitor" class="btn-new-book">New visitor</button>
+  </div>
+  <hr>
+  <div class="sort-search">
+    <div class="sort">
+      <label for="combo">Sort by:</label>
+      <select name="list" id="combo">
+        <option value="0">ID</option>
+        <option value="1">Name</option>
+        <option value="2">Phone</option>
+      </select>
+      <button id="sort">Sort</button>
+    </div>
+    <div class="search">
+      <label for="searchText">Search:</label>
+      <input type="text">
+      <button id="search">Search</button>
+    </div>
+  </div>
+  <div class="list">
+    <table id="listBooks">
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Phone</th>
+        <th>Edit</th>
+        <th>Delete</th>
+      </tr>          
+    </table>
+  </div>`;
+
+  container.appendChild(newItem);
+
+  document.getElementById('newVisitor').addEventListener('click', function (event) { 
+    let modal = document.getElementById('modal');
+    modal.innerHTML = createModalDialogBook();
+    modal.style.display = 'block';
+  });
+}
 
 function addBook(){
   if(checkFields()){
