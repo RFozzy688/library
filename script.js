@@ -27,43 +27,7 @@ function showPageBooks(){
 
   newItem.id = 'content';
   newItem.classList.add('content');
-  newItem.innerHTML = `
-  <div class="header">
-    <h3 class="color-title">ALL BOOKS:</h3>
-    <button id="newBook" class="btn-new-book">New book</button>
-  </div>
-  <hr>
-  <div class="sort-search">
-    <div class="sort">
-      <label for="combo">Sort by:</label>
-      <select name="list" id="combo">
-        <option value="0">ID</option>
-        <option value="1">Name</option>
-        <option value="2">Author</option>
-        <option value="3">Quantity</option>
-      </select>
-      <button id="sort">Sort</button>
-    </div>
-    <div class="search">
-      <label for="searchText">Search:</label>
-      <input type="text">
-      <button id="search">Search</button>
-    </div>
-  </div>
-  <div class="list">
-    <table id="listBooks">
-      <tr>
-        <th>ID</th>
-        <th>Name book</th>
-        <th>Year of publication</th>
-        <th>Publishing house</th>
-        <th>Quantity pages</th>
-        <th>Quantity books</th>
-        <th>Edit</th>
-        <th>Delete</th>
-      </tr>          
-    </table>
-  </div>`;
+  newItem.innerHTML = createHTMLBooks();
 
   container.appendChild(newItem);
 
@@ -72,6 +36,18 @@ function showPageBooks(){
     modal.innerHTML = createModalDialogBook();
     modal.style.display = 'block';
   });
+
+  let arrayObj = localStorage.getItem('books');
+  let books = [];
+
+  if (arrayObj != null){
+    books = JSON.parse(arrayObj);
+
+    books.forEach(book => {
+      addBookToTable(book.id, book.name, book.year, book.publishing, book.pages, book.quantity);
+    });
+  }
+
 }
 
 function showPageVisitors(){
@@ -79,39 +55,7 @@ function showPageVisitors(){
 
   newItem.id = 'content';
   newItem.classList.add('content');
-  newItem.innerHTML = `
-  <div class="header">
-    <h3 class="color-title">ALL VISITORS:</h3>
-    <button id="newVisitor" class="btn-new-book">New visitor</button>
-  </div>
-  <hr>
-  <div class="sort-search">
-    <div class="sort">
-      <label for="combo">Sort by:</label>
-      <select name="list" id="combo">
-        <option value="0">ID</option>
-        <option value="1">Name</option>
-        <option value="2">Phone</option>
-      </select>
-      <button id="sort">Sort</button>
-    </div>
-    <div class="search">
-      <label for="searchText">Search:</label>
-      <input type="text">
-      <button id="search">Search</button>
-    </div>
-  </div>
-  <div class="list">
-    <table id="listBooks">
-      <tr>
-        <th>ID</th>
-        <th>Name</th>
-        <th>Phone</th>
-        <th>Edit</th>
-        <th>Delete</th>
-      </tr>          
-    </table>
-  </div>`;
+  newItem.innerHTML = createHTMLVisitors();
 
   container.appendChild(newItem);
 
@@ -120,6 +64,8 @@ function showPageVisitors(){
     modal.innerHTML = createModalDialogBook();
     modal.style.display = 'block';
   });
+
+
 }
 
 function addBook(){
@@ -130,7 +76,9 @@ function addBook(){
     const pages = document.getElementById('modalQuantityPages').value;
     const quantity = document.getElementById('modalQuantityBooks').value;
 
-    addBookToTable(name, year, publishing, pages, quantity);
+    let items = document.querySelectorAll('tr');
+
+    addBookToTable(items.length, name, year, publishing, pages, quantity);
     addBookToStorage(name, year, publishing, pages, quantity);
 
     closeModalDialog('modalBook');
@@ -186,12 +134,11 @@ function checkFields(){
   }
 }
 
-function addBookToTable(nameBook, yearPublication, publishingHouse, quantityPages, quantityBooks){
-  let items = document.querySelectorAll('tr');
+function addBookToTable(id, nameBook, yearPublication, publishingHouse, quantityPages, quantityBooks){
   let newItem = document.createElement('tr');
 
   newItem.innerHTML = `
-    <td>${items.length}</td>
+    <td>${id}</td>
     <td>${nameBook}</td>
     <td>${yearPublication}</td>
     <td>${publishingHouse}</td>
@@ -223,4 +170,84 @@ function addBookToStorage(nameBook, yearPublication, publishingHouse, quantityPa
   books.push(newBook);
 
   localStorage.setItem('books', JSON.stringify(books));
+}
+
+function createHTMLBooks(){
+  let pageHTML = `
+  <div class="header">
+    <h3 class="color-title">ALL BOOKS:</h3>
+    <button id="newBook" class="btn-new-book">New book</button>
+  </div>
+  <hr>
+  <div class="sort-search">
+    <div class="sort">
+      <label for="combo">Sort by:</label>
+      <select name="list" id="combo">
+        <option value="0">ID</option>
+        <option value="1">Name</option>
+        <option value="2">Author</option>
+        <option value="3">Quantity</option>
+      </select>
+      <button id="sort">Sort</button>
+    </div>
+    <div class="search">
+      <label for="searchText">Search:</label>
+      <input type="text">
+      <button id="search">Search</button>
+    </div>
+  </div>
+  <div class="list">
+    <table id="listBooks">
+      <tr>
+        <th>ID</th>
+        <th>Name book</th>
+        <th>Year of publication</th>
+        <th>Publishing house</th>
+        <th>Quantity pages</th>
+        <th>Quantity books</th>
+        <th>Edit</th>
+        <th>Delete</th>
+      </tr>          
+    </table>
+  </div>`;
+
+  return pageHTML;
+}
+
+function createHTMLVisitors(){
+  let pageHTML = `
+  <div class="header">
+    <h3 class="color-title">ALL VISITORS:</h3>
+    <button id="newVisitor" class="btn-new-book">New visitor</button>
+  </div>
+  <hr>
+  <div class="sort-search">
+    <div class="sort">
+      <label for="combo">Sort by:</label>
+      <select name="list" id="combo">
+        <option value="0">ID</option>
+        <option value="1">Name</option>
+        <option value="2">Phone</option>
+      </select>
+      <button id="sort">Sort</button>
+    </div>
+    <div class="search">
+      <label for="searchText">Search:</label>
+      <input type="text">
+      <button id="search">Search</button>
+    </div>
+  </div>
+  <div class="list">
+    <table id="listBooks">
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Phone</th>
+        <th>Edit</th>
+        <th>Delete</th>
+      </tr>          
+    </table>
+  </div>`
+
+  return pageHTML;
 }
