@@ -1,3 +1,5 @@
+//localStorage.clear();
+
 
 
 document.getElementById('newBook').addEventListener('click', function (event) { 
@@ -15,6 +17,7 @@ function addBook(){
     const quantity = document.getElementById('modalQuantityBooks').value;
 
     addBookToTable(name, year, publishing, pages, quantity);
+    addBookToStorage(name, year, publishing, pages, quantity);
 
     closeModalDialog('modalBook');
   }
@@ -84,4 +87,26 @@ function addBookToTable(nameBook, yearPublication, publishingHouse, quantityPage
     <td><i class="fa fa-trash btn" aria-hidden="true"></i></td>`;
 
   listBooks.appendChild(newItem);
+}
+
+function addBookToStorage(nameBook, yearPublication, publishingHouse, quantityPages, quantityBooks){
+  let arrayObj = localStorage.getItem('books');
+  let books = [];
+
+  if (arrayObj != null){
+    books = JSON.parse(arrayObj);
+  }
+
+  let newBook = {
+    id: books.length + 1,
+    name: nameBook,
+    year: yearPublication,
+    publishing: publishingHouse,
+    pages: quantityPages,
+    quantity: quantityBooks
+  };
+
+  books.push(newBook);
+
+  localStorage.setItem('books', JSON.stringify(books));
 }

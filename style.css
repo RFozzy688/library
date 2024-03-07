@@ -26,11 +26,15 @@ li{
   font-size: 26px;
   padding: 10px 30px;
   &:hover{
-    border-bottom: 2px solid #15969A;
-    padding-bottom: 13px;
+    border-bottom: 4px solid #15969A;
+    padding-bottom: 11px;
+    cursor: pointer;
   }
 }
-
+.selected-item{
+  border-bottom: 4px solid #15969A;
+  padding-bottom: 11px;
+}
 nav{
   height: 55px;
   background-color: #404040;
