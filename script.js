@@ -1,6 +1,12 @@
 //localStorage.clear();
 
-
+const menuItems = document.querySelectorAll('li');
+menuItems.forEach(item => {
+  item.addEventListener('click', () => {
+    menuItems.forEach(o => o.classList.remove('selected-item'));
+    item.classList.add('selected-item');
+  });
+});
 
 document.getElementById('newBook').addEventListener('click', function (event) { 
   let modal = document.getElementById('modal');
