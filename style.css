@@ -128,9 +128,10 @@ td{
   padding: 20px 40px;
 }
 .input-box{
-  margin-top: 5px;
+  margin-top: 3px;
 }
 .warning{
   visibility: hidden;
   color: red;
+  margin-bottom: 0;
 }

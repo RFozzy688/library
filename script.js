@@ -33,7 +33,7 @@ function showPageBooks(){
 
   document.getElementById('newBook').addEventListener('click', function (event) { 
     let modal = document.getElementById('modal');
-    modal.innerHTML = createModalDialogBook();
+    modal.innerHTML = createModalDialogBook('Add book:');
     modal.style.display = 'block';
   });
 
@@ -44,7 +44,7 @@ function showPageBooks(){
     books = JSON.parse(arrayObj);
 
     books.forEach(book => {
-      addBookToTable(book.id, book.name, book.year, book.publishing, book.pages, book.quantity);
+      addBookToTable(book.id, book.name, book.author, book.year, book.publishing, book.pages, book.quantity);
     });
   }
 
@@ -71,16 +71,23 @@ function showPageVisitors(){
 function addBook(){
   if(checkFields()){
     const name = document.getElementById('modalNameBook').value;
+    const author = document.getElementById('modalAuthor').value;
     const year = document.getElementById('modalYearPublication').value;
     const publishing = document.getElementById('modalPublishingHouse').value;
     const pages = document.getElementById('modalQuantityPages').value;
     const quantity = document.getElementById('modalQuantityBooks').value;
+    const title = document.getElementById('modalTitle').innerText;    
 
-    let items = document.querySelectorAll('tr');
-
-    addBookToTable(items.length, name, year, publishing, pages, quantity);
-    addBookToStorage(name, year, publishing, pages, quantity);
-
+    if (title == 'Add book:'){
+      let items = document.querySelectorAll('tr');
+      addBookToTable(items.length, name, author, year, publishing, pages, quantity);
+      addBookToStorage(name, author, year, publishing, pages, quantity);
+    }
+    else{
+      let index = editBook(name, author, year, publishing, pages, quantity);
+      editBooksStorage(index, name, author, year, publishing, pages, quantity);
+    }    
+    
     closeModalDialog('modalBook');
   }
   else{
@@ -96,13 +103,15 @@ function closeModalDialog(dialogName) {
   parentModal.style.display = 'none';
 }
 
-function createModalDialogBook(){
+function createModalDialogBook(title){
   return `
   <div id="modalBook" class="modal-book">
     <div id="modalClose" class="modal-close"><i onclick="closeModalDialog('modalBook')" class="fa fa-times btn" aria-hidden="true"></i></div>
-    <p class="modal-title">Add book:</p>
+    <p id="modalTitle" class="modal-title">${title}</p>
     <label class="label-text" for="modalNameBook">Name book:</label>
     <input class="input-box" id="modalNameBook" type="text">
+    <label class="label-text" for="modalAuthor">Author:</label>
+    <input class="input-box" id="modalAuthor" type="text">
     <label class="label-text" for="modalYearPublication">Year of publication:</label>
     <input class="input-box" id="modalYearPublication" type="text">
     <label class="label-text" for="modalPublishingHouse">Publishing house:</label>
@@ -113,7 +122,7 @@ function createModalDialogBook(){
     <input class="input-box" id="modalQuantityBooks" type="number">
     <button id="addBook" class="modal-btn" onclick="addBook()">Save</button>
     <p id="warning" class="warning">Заполните все поля формы</p>
-  </div>`
+  </div>`;
 }
 
 function checkFields(){
@@ -134,23 +143,24 @@ function checkFields(){
   }
 }
 
-function addBookToTable(id, nameBook, yearPublication, publishingHouse, quantityPages, quantityBooks){
+function addBookToTable(id, nameBook, authorBook, yearPublication, publishingHouse, quantityPages, quantityBooks){
   let newItem = document.createElement('tr');
 
   newItem.innerHTML = `
     <td>${id}</td>
     <td>${nameBook}</td>
+    <td>${authorBook}</td>
     <td>${yearPublication}</td>
     <td>${publishingHouse}</td>
     <td>${quantityPages}</td>
     <td>${quantityBooks}</td>
-    <td><i class="fa fa-pencil btn" aria-hidden="true"></i></td>
+    <td><i onclick="getDataForEditing(${id})" class="fa fa-pencil btn" aria-hidden="true"></i></td>
     <td><i class="fa fa-trash btn" aria-hidden="true"></i></td>`;
 
   listBooks.appendChild(newItem);
 }
 
-function addBookToStorage(nameBook, yearPublication, publishingHouse, quantityPages, quantityBooks){
+function addBookToStorage(nameBook, authorBook, yearPublication, publishingHouse, quantityPages, quantityBooks){
   let arrayObj = localStorage.getItem('books');
   let books = [];
 
@@ -161,6 +171,7 @@ function addBookToStorage(nameBook, yearPublication, publishingHouse, quantityPa
   let newBook = {
     id: books.length + 1,
     name: nameBook,
+    author: authorBook,
     year: yearPublication,
     publishing: publishingHouse,
     pages: quantityPages,
@@ -201,6 +212,7 @@ function createHTMLBooks(){
       <tr>
         <th>ID</th>
         <th>Name book</th>
+        <th>Author</th>
         <th>Year of publication</th>
         <th>Publishing house</th>
         <th>Quantity pages</th>
@@ -238,7 +250,7 @@ function createHTMLVisitors(){
     </div>
   </div>
   <div class="list">
-    <table id="listBooks">
+    <table id="listVisitors">
       <tr>
         <th>ID</th>
         <th>Name</th>
@@ -250,4 +262,60 @@ function createHTMLVisitors(){
   </div>`
 
   return pageHTML;
+}
+
+function editBook(nameBook, authorBook, yearPublication, publishingHouse, quantityPages, quantityBooks){
+  let row = localStorage.getItem('rowIndex');
+  let item = listBooks.childNodes[parseInt(row) + 1];
+
+  item.children[1].innerText = nameBook;
+  item.children[2].innerText = authorBook;
+  item.children[3].innerText = yearPublication;
+  item.children[4].innerText = publishingHouse;
+  item.children[5].innerText = quantityPages;
+  item.children[6].innerText = quantityBooks;
+
+  localStorage.removeItem('rowIndex');
+
+  return parseInt(row);
+}
+
+function getDataForEditing(idItem){
+  let modal = document.getElementById('modal');
+  modal.innerHTML = createModalDialogBook('Edit book:');
+  modal.style.display = 'block';
+
+  localStorage.setItem('rowIndex', idItem);
+
+  let item = listBooks.childNodes[idItem + 1];
+
+  let name = document.getElementById('modalNameBook');
+  name.value = item.children[1].innerHTML;
+  let author = document.getElementById('modalAuthor');
+  author.value = item.children[2].innerHTML;
+  let year = document.getElementById('modalYearPublication');
+  year.value = item.children[3].innerHTML;
+  let publishing = document.getElementById('modalPublishingHouse');
+  publishing.value = item.children[4].innerHTML;
+  let pages = document.getElementById('modalQuantityPages');
+  pages.value = item.children[5].innerHTML;
+  let quantity = document.getElementById('modalQuantityBooks');
+  quantity.value = item.children[5].innerHTML;
+}
+
+function editBooksStorage(index, nameBook, authorBook, yearPublication, publishingHouse, quantityPages, quantityBooks){
+  let books = JSON.parse(localStorage.getItem('books'));
+
+  console.log(books);
+
+  books[index - 1].name = nameBook;
+  books[index - 1].author = nameBook;
+  books[index - 1].year = yearPublication;
+  books[index - 1].publishing = publishingHouse;
+  books[index - 1].pages = quantityPages;
+  books[index - 1].quantity = quantityBooks;
+
+  console.log(books);
+
+  localStorage.setItem('books', JSON.stringify(books));
 }
