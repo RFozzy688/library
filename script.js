@@ -79,13 +79,13 @@ function addBook(){
     const title = document.getElementById('modalTitle').innerText;    
 
     if (title == 'Add book:'){
-      let items = document.querySelectorAll('tr');
-      addBookToTable(items.length, name, author, year, publishing, pages, quantity);
+      let lastId = getLastBookId();
+      addBookToTable(lastId, name, author, year, publishing, pages, quantity);
       addBookToStorage(name, author, year, publishing, pages, quantity);
     }
     else{
-      let index = editBook(name, author, year, publishing, pages, quantity);
-      editBooksStorage(index, name, author, year, publishing, pages, quantity);
+      let idBook = editBook(name, author, year, publishing, pages, quantity);
+      editBooksStorage(idBook, name, author, year, publishing, pages, quantity);
     }    
     
     closeModalDialog('modalBook');
@@ -146,6 +146,7 @@ function checkFields(){
 function addBookToTable(id, nameBook, authorBook, yearPublication, publishingHouse, quantityPages, quantityBooks){
   let newItem = document.createElement('tr');
 
+  newItem.id = "rowId" + id;
   newItem.innerHTML = `
     <td>${id}</td>
     <td>${nameBook}</td>
@@ -154,8 +155,8 @@ function addBookToTable(id, nameBook, authorBook, yearPublication, publishingHou
     <td>${publishingHouse}</td>
     <td>${quantityPages}</td>
     <td>${quantityBooks}</td>
-    <td><i onclick="getDataForEditing(${id})" class="fa fa-pencil btn" aria-hidden="true"></i></td>
-    <td><i class="fa fa-trash btn" aria-hidden="true"></i></td>`;
+    <td><i onclick="getDataForEditing(${newItem.id})" class="fa fa-pencil btn" aria-hidden="true"></i></td>
+    <td><i onclick="deleteEntry('listBooks', ${newItem.id})" class="fa fa-trash btn" aria-hidden="true"></i></td>`;
 
   listBooks.appendChild(newItem);
 }
@@ -169,7 +170,7 @@ function addBookToStorage(nameBook, authorBook, yearPublication, publishingHouse
   }
 
   let newBook = {
-    id: books.length + 1,
+    id: getLastBookId(),
     name: nameBook,
     author: authorBook,
     year: yearPublication,
@@ -195,9 +196,9 @@ function createHTMLBooks(){
       <label for="combo">Sort by:</label>
       <select name="list" id="combo">
         <option value="0">ID</option>
-        <option value="1">Name</option>
+        <option value="1">Name book</option>
         <option value="2">Author</option>
-        <option value="3">Quantity</option>
+        <option value="3">Quantity books</option>
       </select>
       <button id="sort">Sort</button>
     </div>
@@ -265,8 +266,8 @@ function createHTMLVisitors(){
 }
 
 function editBook(nameBook, authorBook, yearPublication, publishingHouse, quantityPages, quantityBooks){
-  let row = localStorage.getItem('rowIndex');
-  let item = listBooks.childNodes[parseInt(row) + 1];
+  let rowId = localStorage.getItem('rowIdListBooks'); 
+  let item = document.getElementById(rowId);
 
   item.children[1].innerText = nameBook;
   item.children[2].innerText = authorBook;
@@ -275,47 +276,78 @@ function editBook(nameBook, authorBook, yearPublication, publishingHouse, quanti
   item.children[5].innerText = quantityPages;
   item.children[6].innerText = quantityBooks;
 
-  localStorage.removeItem('rowIndex');
+  localStorage.removeItem('rowIdListBooks');
 
-  return parseInt(row);
+   return parseInt(item.children[0].innerText);
 }
 
-function getDataForEditing(idItem){
+function getDataForEditing(rowId){
   let modal = document.getElementById('modal');
   modal.innerHTML = createModalDialogBook('Edit book:');
   modal.style.display = 'block';
 
-  localStorage.setItem('rowIndex', idItem);
-
-  let item = listBooks.childNodes[idItem + 1];
+  localStorage.setItem('rowIdListBooks', rowId.id);
 
   let name = document.getElementById('modalNameBook');
-  name.value = item.children[1].innerHTML;
+  name.value = rowId.children[1].innerHTML;
   let author = document.getElementById('modalAuthor');
-  author.value = item.children[2].innerHTML;
+  author.value = rowId.children[2].innerHTML;
   let year = document.getElementById('modalYearPublication');
-  year.value = item.children[3].innerHTML;
+  year.value = rowId.children[3].innerHTML;
   let publishing = document.getElementById('modalPublishingHouse');
-  publishing.value = item.children[4].innerHTML;
+  publishing.value = rowId.children[4].innerHTML;
   let pages = document.getElementById('modalQuantityPages');
-  pages.value = item.children[5].innerHTML;
+  pages.value = rowId.children[5].innerHTML;
   let quantity = document.getElementById('modalQuantityBooks');
-  quantity.value = item.children[5].innerHTML;
+  quantity.value = rowId.children[6].innerHTML;
 }
 
-function editBooksStorage(index, nameBook, authorBook, yearPublication, publishingHouse, quantityPages, quantityBooks){
+function editBooksStorage(idBook, nameBook, authorBook, yearPublication, publishingHouse, quantityPages, quantityBooks){
   let books = JSON.parse(localStorage.getItem('books'));
 
-  console.log(books);
+  for (let i = 0; i < books.length; i++){
+    if (books[i].id == idBook){
+      books[i].name = nameBook;
+      books[i].author = authorBook;
+      books[i].year = yearPublication;
+      books[i].publishing = publishingHouse;
+      books[i].pages = quantityPages;
+      books[i].quantity = quantityBooks;
 
-  books[index - 1].name = nameBook;
-  books[index - 1].author = nameBook;
-  books[index - 1].year = yearPublication;
-  books[index - 1].publishing = publishingHouse;
-  books[index - 1].pages = quantityPages;
-  books[index - 1].quantity = quantityBooks;
+      break;
+    }
+  }
+  
+  localStorage.setItem('books', JSON.stringify(books));
+}
 
-  console.log(books);
+function deleteEntry(idTable, idRow){
+  let idListBooks = document.getElementById(idTable);
+  let idBook = idRow.children[0].innerText;
+
+  idListBooks.removeChild(idRow);
+
+  let books = JSON.parse(localStorage.getItem('books'));
+  let index = books.findIndex(book => book.id == idBook);
+
+  books.splice(index, 1);
 
   localStorage.setItem('books', JSON.stringify(books));
+}
+
+function getLastBookId(){
+  let arrayObj = localStorage.getItem('books');
+  let books = [];
+
+  if (arrayObj != null){
+    books = JSON.parse(arrayObj);
+
+    if (books.length == 0){
+      return 1;
+    }
+    
+    return books[books.length - 1].id + 1;
+  }
+
+  return 1;
 }
