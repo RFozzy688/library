@@ -14,14 +14,9 @@ document.getElementById('pageBooks').addEventListener('click', function (event) 
   showPageBooks();
 });
 
-document.getElementById('pageVisitors').addEventListener('click', function (event) {
-  container.removeChild(content);
-
-  showPageVisitors();
-});
-
 showPageBooks();
 
+//=================================== PAGE BOOKS ==========================================
 function showPageBooks(){
   let newItem = document.createElement('div');
 
@@ -65,24 +60,6 @@ function showPageBooks(){
 
 }
 
-function showPageVisitors(){
-  let newItem = document.createElement('div');
-
-  newItem.id = 'content';
-  newItem.classList.add('content');
-  newItem.innerHTML = createHTMLVisitors();
-
-  container.appendChild(newItem);
-
-  document.getElementById('newVisitor').addEventListener('click', function (event) { 
-    let modal = document.getElementById('modal');
-    modal.innerHTML = createModalDialogBook();
-    modal.style.display = 'block';
-  });
-
-
-}
-
 function addBook(){
   if(checkFields()){
     const name = document.getElementById('modalNameBook').value;
@@ -111,13 +88,6 @@ function addBook(){
   
 }
 
-function closeModalDialog(dialogName) { 
-  let closeModal = document.getElementById(dialogName);
-  let parentModal = closeModal.parentNode;
-  parentModal.removeChild(closeModal);
-  parentModal.style.display = 'none';
-}
-
 function createModalDialogBook(title){
   return `
   <div id="modalBook" class="modal-book">
@@ -140,24 +110,6 @@ function createModalDialogBook(title){
   </div>`;
 }
 
-function checkFields(){
-  const fields = document.querySelectorAll('.input-box');
-  let fieldsFilled = 0;
-
-  fields.forEach(field => {
-    if (field.value != ''){
-      fieldsFilled++;
-    }
-  });
-
-  if (fields.length == fieldsFilled){
-    return true;
-  }
-  else{
-    return false;
-  }
-}
-
 function addBookToTable(id, nameBook, authorBook, yearPublication, publishingHouse, quantityPages, quantityBooks){
   let newItem = document.createElement('tr');
 
@@ -171,7 +123,7 @@ function addBookToTable(id, nameBook, authorBook, yearPublication, publishingHou
     <td>${quantityPages}</td>
     <td>${quantityBooks}</td>
     <td><i onclick="getDataForEditing(${newItem.id})" class="fa fa-pencil btn" aria-hidden="true"></i></td>
-    <td><i onclick="deleteEntry('listBooks', ${newItem.id})" class="fa fa-trash btn" aria-hidden="true"></i></td>`;
+    <td><i onclick="deleteEntry('listBooks', ${newItem.id}, 'books')" class="fa fa-trash btn" aria-hidden="true"></i></td>`;
 
   listBooks.appendChild(newItem);
 }
@@ -242,44 +194,6 @@ function createHTMLBooks(){
   return pageHTML;
 }
 
-function createHTMLVisitors(){
-  let pageHTML = `
-  <div class="header">
-    <h3 class="color-title">ALL VISITORS:</h3>
-    <button id="newVisitor" class="btn-new-book">New visitor</button>
-  </div>
-  <hr>
-  <div class="sort-search">
-    <div class="sort">
-      <label for="combo">Sort by:</label>
-      <select name="list" id="combo">
-        <option value="0">ID</option>
-        <option value="1">Name</option>
-        <option value="2">Phone</option>
-      </select>
-      <button id="sort">Sort</button>
-    </div>
-    <div class="search">
-      <label for="searchText">Search:</label>
-      <input type="text">
-      <button id="search">Search</button>
-    </div>
-  </div>
-  <div class="list">
-    <table id="listVisitors">
-      <tr>
-        <th>ID</th>
-        <th>Name</th>
-        <th>Phone</th>
-        <th>Edit</th>
-        <th>Delete</th>
-      </tr>          
-    </table>
-  </div>`
-
-  return pageHTML;
-}
-
 function editBook(nameBook, authorBook, yearPublication, publishingHouse, quantityPages, quantityBooks){
   let rowId = localStorage.getItem('rowIdListBooks'); 
   let item = document.getElementById(rowId);
@@ -336,20 +250,6 @@ function editBooksStorage(idBook, nameBook, authorBook, yearPublication, publish
   localStorage.setItem('books', JSON.stringify(books));
 }
 
-function deleteEntry(idTable, idRow){
-  let idListBooks = document.getElementById(idTable);
-  let idBook = idRow.children[0].innerText;
-
-  idListBooks.removeChild(idRow);
-
-  let books = JSON.parse(localStorage.getItem('books'));
-  let index = books.findIndex(book => book.id == idBook);
-
-  books.splice(index, 1);
-
-  localStorage.setItem('books', JSON.stringify(books));
-}
-
 function getLastBookId(){
   let arrayObj = localStorage.getItem('books');
   let books = [];
@@ -365,14 +265,6 @@ function getLastBookId(){
   }
 
   return 1;
-}
-
-function deleteTableRows(idTable){
-  let table = document.getElementById(idTable);
-
-  while (table.childElementCount != 1){
-    table.removeChild(table.children[1]);
-  }
 }
 
 function booksSortBy(strSortBy){
@@ -437,4 +329,117 @@ function booksSearch(searchText){
       addBookToTable(book.id, book.name, book.author, book.year, book.publishing, book.pages, book.quantity);
     });
   }
+}
+
+//=================================== PAGE VISITORS ==========================================
+
+document.getElementById('pageVisitors').addEventListener('click', function (event) {
+  container.removeChild(content);
+
+  showPageVisitors();
+});
+
+function showPageVisitors(){
+  let newItem = document.createElement('div');
+
+  newItem.id = 'content';
+  newItem.classList.add('content');
+  newItem.innerHTML = createHTMLVisitors();
+
+  container.appendChild(newItem);
+
+  document.getElementById('newVisitor').addEventListener('click', function (event) { 
+    let modal = document.getElementById('modal');
+    modal.innerHTML = createModalDialogBook();
+    modal.style.display = 'block';
+  });
+
+
+}
+
+function createHTMLVisitors(){
+  let pageHTML = `
+  <div class="header">
+    <h3 class="color-title">ALL VISITORS:</h3>
+    <button id="newVisitor" class="btn-new-book">New visitor</button>
+  </div>
+  <hr>
+  <div class="sort-search">
+    <div class="sort">
+      <label for="combo">Sort by:</label>
+      <select name="list" id="combo">
+        <option value="0">ID</option>
+        <option value="1">Name</option>
+        <option value="2">Phone</option>
+      </select>
+      <button id="sort">Sort</button>
+    </div>
+    <div class="search">
+      <label for="searchText">Search:</label>
+      <input type="text">
+      <button id="search">Search</button>
+    </div>
+  </div>
+  <div class="list">
+    <table id="listVisitors">
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Phone</th>
+        <th>Edit</th>
+        <th>Delete</th>
+      </tr>          
+    </table>
+  </div>`
+
+  return pageHTML;
+}
+
+//=================================== GENERAL FUNCTIONS ==========================================
+
+function closeModalDialog(dialogName) { 
+  let closeModal = document.getElementById(dialogName);
+  let parentModal = closeModal.parentNode;
+  parentModal.removeChild(closeModal);
+  parentModal.style.display = 'none';
+}
+
+function checkFields(){
+  const fields = document.querySelectorAll('.input-box');
+  let fieldsFilled = 0;
+
+  fields.forEach(field => {
+    if (field.value != ''){
+      fieldsFilled++;
+    }
+  });
+
+  if (fields.length == fieldsFilled){
+    return true;
+  }
+  else{
+    return false;
+  }
+}
+
+function deleteTableRows(idTable){
+  let table = document.getElementById(idTable);
+
+  while (table.childElementCount != 1){
+    table.removeChild(table.children[1]);
+  }
+}
+
+function deleteEntry(idTable, idRow, keyStorage){
+  let parentElemTable = document.getElementById(idTable);
+  let idEntry = idRow.children[0].innerText;
+
+  parentElemTable.removeChild(idRow);
+
+  let objectsArray = JSON.parse(localStorage.getItem(keyStorage));
+  let index = objectsArray.findIndex(object => object.id == idEntry);
+
+  objectsArray.splice(index, 1);
+
+  localStorage.setItem(keyStorage, JSON.stringify(objectsArray));
 }
