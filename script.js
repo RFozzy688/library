@@ -37,6 +37,13 @@ function showPageBooks(){
     modal.style.display = 'block';
   });
 
+  document.getElementById('sort').addEventListener('click', function (event) {
+    let comboBox = document.getElementById('combo');
+    let strSortBy = comboBox.options[comboBox.selectedIndex].text;
+
+    sortBy(strSortBy);
+  });
+
   let arrayObj = localStorage.getItem('books');
   let books = [];
 
@@ -350,4 +357,52 @@ function getLastBookId(){
   }
 
   return 1;
+}
+
+function deleteTableRows(idTable){
+  let table = document.getElementById(idTable);
+
+  while (table.childElementCount != 1){
+    table.removeChild(table.children[1]);
+  }
+}
+
+function sortBy(strSortBy){
+  let arrayObj = localStorage.getItem('books');
+  let books = [];
+
+  if (arrayObj != null){
+    books = JSON.parse(arrayObj);
+  }
+
+  switch (strSortBy){
+    case "ID":
+      books.sort((a, b) => a.id - b.id);
+      deleteTableRows('listBooks');
+      books.forEach(book => {
+        addBookToTable(book.id, book.name, book.author, book.year, book.publishing, book.pages, book.quantity);
+      });
+      break;
+    case "Name book":
+      books.sort((a, b) => a.name.localeCompare(b.name));
+      deleteTableRows('listBooks');
+      books.forEach(book => {
+        addBookToTable(book.id, book.name, book.author, book.year, book.publishing, book.pages, book.quantity);
+      });
+      break;
+    case "Author":
+      books.sort((a, b) => a.author.localeCompare(b.author));
+      deleteTableRows('listBooks');
+      books.forEach(book => {
+        addBookToTable(book.id, book.name, book.author, book.year, book.publishing, book.pages, book.quantity);
+      });
+      break;
+    case "Quantity books":
+      books.sort((a, b) => a.quantity - b.quantity);
+      deleteTableRows('listBooks');
+      books.forEach(book => {
+        addBookToTable(book.id, book.name, book.author, book.year, book.publishing, book.pages, book.quantity);
+      });
+      break;
+  }
 }
