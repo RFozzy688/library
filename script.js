@@ -1,4 +1,7 @@
 //localStorage.clear();
+//localStorage.removeItem('books');
+//let books = JSON.parse(localStorage.getItem('books'));
+//localStorage.setItem('books-test', JSON.stringify(books));
 
 const menuItems = document.querySelectorAll('li');
 menuItems.forEach(item => {
@@ -275,7 +278,13 @@ function booksSortBy(strSortBy){
     books = JSON.parse(arrayObj);
   }
 
-  deleteTableRows('listBooks');
+  if (books.length == 0){
+    let modal = document.getElementById('modal');
+    modal.innerHTML = createMessageBox('Message', 'The data array for sorting is empty');
+    modal.style.display = 'block';
+    
+    return;
+  }
 
   switch (strSortBy){
     case "ID":
@@ -292,6 +301,8 @@ function booksSortBy(strSortBy){
       break;
   }
 
+  deleteTableRows('listBooks');
+
   books.forEach(book => {
     addBookToTable(book.id, book.name, book.author, book.year, book.publishing, book.pages, book.quantity);
   });
@@ -304,6 +315,14 @@ function booksSearch(searchText){
 
   if (arrayObj != null){
     books = JSON.parse(arrayObj);
+  }
+
+  if (books.length == 0){
+    let modal = document.getElementById('modal');
+    modal.innerHTML = createMessageBox('Message', 'The data array for searching is empty');
+    modal.style.display = 'block';
+    
+    return;
   }
 
   books.forEach(book => {
@@ -396,6 +415,22 @@ function createHTMLVisitors(){
 }
 
 //=================================== GENERAL FUNCTIONS ==========================================
+
+function createMessageBox(titleMsg, textMsg){
+  return `
+  <div id="msgBox" class="msg-box">
+    <div class="msg-box-header">
+      <p id="msgBoxTitle" class="msg-box-title">${titleMsg}</p>
+      <div id="msgBoxClose" class="modal-close">
+        <i onclick="closeModalDialog('msgBox')" class="fa fa-times btn" aria-hidden="true"></i>
+      </div>      
+    </div>
+    <div class="msg-box-discription">
+      <i class="fa fa-info-circle fa-3x color-icon" aria-hidden="true"></i>
+      <p id="msgBoxText" class="msg-box-text">${textMsg}</p>
+    </div>      
+  </div>`
+}
 
 function closeModalDialog(dialogName) { 
   let closeModal = document.getElementById(dialogName);
