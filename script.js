@@ -1,7 +1,8 @@
 //localStorage.clear();
 //localStorage.removeItem('books');
-//let books = JSON.parse(localStorage.getItem('books'));
-//localStorage.setItem('books-test', JSON.stringify(books));
+// let books = JSON.parse(localStorage.getItem('books'));
+// books.splice(7, 1);
+// localStorage.setItem('books-test', JSON.stringify(books));
 
 const menuItems = document.querySelectorAll('li');
 menuItems.forEach(item => {
@@ -74,7 +75,7 @@ function addBook(){
     const title = document.getElementById('modalTitle').innerText;    
 
     if (title == 'Add book:'){
-      let lastId = getLastBookId();
+      let lastId = getLastId('books');
       addBookToTable(lastId, name, author, year, publishing, pages, quantity);
       addBookToStorage(name, author, year, publishing, pages, quantity);
     }
@@ -93,7 +94,7 @@ function addBook(){
 
 function createModalDialogBook(title){
   return `
-  <div id="modalBook" class="modal-book">
+  <div id="modalBook" class="modal-dialog">
     <div id="modalClose" class="modal-close"><i onclick="closeModalDialog('modalBook')" class="fa fa-times btn" aria-hidden="true"></i></div>
     <p id="modalTitle" class="modal-title">${title}</p>
     <label class="label-text" for="modalNameBook">Name book:</label>
@@ -140,13 +141,14 @@ function addBookToStorage(nameBook, authorBook, yearPublication, publishingHouse
   }
 
   let newBook = {
-    id: getLastBookId(),
+    id: getLastId('books'),
     name: nameBook,
     author: authorBook,
     year: yearPublication,
     publishing: publishingHouse,
     pages: quantityPages,
-    quantity: quantityBooks
+    quantity: quantityBooks,
+    rating: 0
   };
 
   books.push(newBook);
@@ -253,23 +255,6 @@ function editBooksStorage(idBook, nameBook, authorBook, yearPublication, publish
   localStorage.setItem('books', JSON.stringify(books));
 }
 
-function getLastBookId(){
-  let arrayObj = localStorage.getItem('books');
-  let books = [];
-
-  if (arrayObj != null){
-    books = JSON.parse(arrayObj);
-
-    if (books.length == 0){
-      return 1;
-    }
-    
-    return books[books.length - 1].id + 1;
-  }
-
-  return 1;
-}
-
 function booksSortBy(strSortBy){
   let arrayObj = localStorage.getItem('books');
   let books = [];
@@ -369,10 +354,35 @@ function showPageVisitors(){
 
   document.getElementById('newVisitor').addEventListener('click', function (event) { 
     let modal = document.getElementById('modal');
-    modal.innerHTML = createModalDialogBook();
+    modal.innerHTML = createModalDialogVisitor('Add visitor:');
     modal.style.display = 'block';
   });
 
+  document.getElementById('sort').addEventListener('click', function (event) {
+    let comboBox = document.getElementById('combo');
+    let strSortBy = comboBox.options[comboBox.selectedIndex].text;
+
+    visitorsSortBy(strSortBy);
+  });
+
+  document.getElementById('search').addEventListener('click', function (event) {
+    let searchText = document.getElementById('searchText');
+
+    visitorsSearch(searchText.value);
+
+    searchText.value = '';
+  });
+
+  let arrayObj = localStorage.getItem('visitors');
+  let visitors = [];
+
+  if (arrayObj != null){
+    visitors = JSON.parse(arrayObj);
+
+    visitors.forEach(visitor => {
+      addVisitorToTable(visitor.id, visitor.name, visitor.phone);
+    });
+  }
 
 }
 
@@ -389,13 +399,12 @@ function createHTMLVisitors(){
       <select name="list" id="combo">
         <option value="0">ID</option>
         <option value="1">Name</option>
-        <option value="2">Phone</option>
       </select>
       <button id="sort">Sort</button>
     </div>
     <div class="search">
       <label for="searchText">Search:</label>
-      <input type="text">
+      <input id="searchText" type="text">
       <button id="search">Search</button>
     </div>
   </div>
@@ -412,6 +421,186 @@ function createHTMLVisitors(){
   </div>`
 
   return pageHTML;
+}
+
+function createModalDialogVisitor(title){
+  return `
+  <div id="modalVisitor" class="modal-dialog">
+    <div id="modalClose" class="modal-close"><i onclick="closeModalDialog('modalVisitor')" class="fa fa-times btn" aria-hidden="true"></i></div>
+    <p id="modalTitle" class="modal-title">${title}</p>
+    <label class="label-text" for="modalNameVisitor">Name visitor:</label>
+    <input class="input-box" id="modalNameVisitor" type="text">
+    <label class="label-text" for="modalPhoneVisitor">Phone:</label>
+    <input class="input-box" id="modalPhoneVisitor" type="text">
+    <button id="addVisitor" class="modal-btn" onclick="addVisitor()">Save</button>
+    <p id="warning" class="warning">Заполните все поля формы</p>
+  </div>`;
+}
+
+function addVisitor(){
+  if(checkFields()){
+    const name = document.getElementById('modalNameVisitor').value;
+    const phone = document.getElementById('modalPhoneVisitor').value;
+    const title = document.getElementById('modalTitle').innerText;    
+
+    if (title == 'Add visitor:'){
+      let lastId = getLastId('visitors');
+      addVisitorToTable(lastId, name, phone);
+      addVisitorToStorage(name, phone);
+    }
+    else{
+      let idVisitor = editVisitor(name, phone);
+      editVisitorStorage(idVisitor, name, phone);
+    }    
+    
+    closeModalDialog('modalVisitor');
+  }
+  else{
+    document.getElementById('warning').style.visibility = 'visible';
+  }
+}
+
+function editVisitor(nameVisitor, phoneVisitor){
+  let rowId = localStorage.getItem('rowIdListVisitors'); 
+  let item = document.getElementById(rowId);
+
+  item.children[1].innerText = nameVisitor;
+  item.children[2].innerText = phoneVisitor;
+
+  localStorage.removeItem('rowIdListVisitors');
+
+   return parseInt(item.children[0].innerText);
+}
+
+function addVisitorToTable(id, nameVisitor, phoneVisitor){
+  let newItem = document.createElement('tr');
+
+  newItem.id = "rowId" + id;
+  newItem.innerHTML = `
+    <td>${id}</td>
+    <td>${nameVisitor}</td>
+    <td>${phoneVisitor}</td>
+    <td><i onclick="getDataForEditingVisitor(${newItem.id})" class="fa fa-pencil btn" aria-hidden="true"></i></td>
+    <td><i onclick="deleteEntry('listVisitors', ${newItem.id}, 'visitors')" class="fa fa-trash btn" aria-hidden="true"></i></td>`;
+
+    listVisitors.appendChild(newItem);
+}
+
+function addVisitorToStorage(nameVisitor, phoneVisitor){
+  let arrayObj = localStorage.getItem('visitors');
+  let visitors = [];
+
+  if (arrayObj != null){
+    visitors = JSON.parse(arrayObj);
+  }
+
+  let newVisitor = {
+    id: getLastId('visitors'),
+    name: nameVisitor,
+    phone: phoneVisitor,
+    rating: 0
+  };
+
+  visitors.push(newVisitor);
+
+  localStorage.setItem('visitors', JSON.stringify(visitors));
+}
+
+function editVisitorStorage(idVisitor, nameVisitor, phoneVisitor){
+  let visitors = JSON.parse(localStorage.getItem('visitors'));
+
+  for (let i = 0; i < visitors.length; i++){
+    if (visitors[i].id == idVisitor){
+      visitors[i].name = nameVisitor;
+      visitors[i].phone = phoneVisitor;
+
+      break;
+    }
+  }
+  
+  localStorage.setItem('visitors', JSON.stringify(visitors));
+}
+
+function getDataForEditingVisitor(rowId){
+  let modal = document.getElementById('modal');
+  modal.innerHTML = createModalDialogVisitor('Edit visitor:');
+  modal.style.display = 'block';
+
+  localStorage.setItem('rowIdListVisitors', rowId.id);
+
+  let name = document.getElementById('modalNameVisitor');
+  name.value = rowId.children[1].innerHTML;
+  let phone = document.getElementById('modalPhoneVisitor');
+  phone.value = rowId.children[2].innerHTML;
+}
+
+function visitorsSortBy(strSortBy){
+  let arrayObj = localStorage.getItem('visitors');
+  let visitors = [];
+
+  if (arrayObj != null){
+    visitors = JSON.parse(arrayObj);
+  }
+
+  if (visitors.length == 0){
+    let modal = document.getElementById('modal');
+    modal.innerHTML = createMessageBox('Message', 'The data array for sorting is empty');
+    modal.style.display = 'block';
+    
+    return;
+  }
+
+  switch (strSortBy){
+    case "ID":
+      visitors.sort((a, b) => a.id - b.id);
+      break;
+    case "Name":
+      visitors.sort((a, b) => a.name.localeCompare(b.name));
+      break;
+  }
+
+  deleteTableRows('listVisitors');
+
+  visitors.forEach(visitor => {
+    addVisitorToTable(visitor.id, visitor.name, visitor.phone);
+  });
+}
+
+function visitorsSearch(searchText){
+  let arrayObj = localStorage.getItem('visitors');
+  let visitors = [];
+  let foundVisitors = [];
+
+  if (arrayObj != null){
+    visitors = JSON.parse(arrayObj);
+  }
+
+  if (visitors.length == 0){
+    let modal = document.getElementById('modal');
+    modal.innerHTML = createMessageBox('Message', 'The data array for searching is empty');
+    modal.style.display = 'block';
+    
+    return;
+  }
+
+  visitors.forEach(visitor => {
+    let strNameLowerCase = visitor.name.toLowerCase();
+
+    if (strNameLowerCase.indexOf(searchText) != -1){
+      foundVisitors.push(visitor);
+    }
+    else if (visitor.phone.indexOf(searchText) != -1){
+      foundVisitors.push(visitor);
+    }
+  });
+
+  if (foundVisitors.length != 0){
+    deleteTableRows('listVisitors');
+    
+    foundVisitors.forEach(visitor => {
+      addVisitorToTable(visitor.id, visitor.name, visitor.phone);
+    });
+  }
 }
 
 //=================================== GENERAL FUNCTIONS ==========================================
@@ -477,4 +666,21 @@ function deleteEntry(idTable, idRow, keyStorage){
   objectsArray.splice(index, 1);
 
   localStorage.setItem(keyStorage, JSON.stringify(objectsArray));
+}
+
+function getLastId(keyStorage){
+  let arrayObj = localStorage.getItem(keyStorage);
+  let array = [];
+
+  if (arrayObj != null){
+    array = JSON.parse(arrayObj);
+
+    if (array.length == 0){
+      return 1;
+    }
+    
+    return array[array.length - 1].id + 1;
+  }
+
+  return 1;
 }

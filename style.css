@@ -115,7 +115,7 @@ td{
 .modal-btn{
   margin-top: 10px;
 }
-.modal-book{
+.modal-dialog{
   display: flex;
   flex-direction: column;
   position: fixed;
