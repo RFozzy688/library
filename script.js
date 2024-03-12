@@ -993,6 +993,115 @@ function today(){
   return day + '.' + month + '.' + year;
 }
 
+//=================================== PAGE STATISTICS ==========================================
+
+document.getElementById('pageStatistics').addEventListener('click', function (event) {
+  container.removeChild(content);
+
+  showPageStatistics();
+});
+
+function showPageStatistics(){
+  let newItem = document.createElement('div');
+
+  newItem.id = 'content';
+  newItem.classList.add('content');
+  newItem.innerHTML = createHTMLStatistics();
+
+  container.appendChild(newItem);
+
+  popularBooks(5);
+  activeVisitors(5);
+}
+
+function createHTMLStatistics(){
+  let pageHTML = `
+  <div class="header">
+    <h3 class="color-title">STATISTICS:</h3>
+  </div>
+  <hr>
+  <p>Most popular books:</p>
+  <div class="list">
+    <table id="listBooks">
+      <tr>
+        <th>ID</th>
+        <th>Name book</th>
+        <th>Author</th>
+        <th>Year of publication</th>
+        <th>Publishing house</th>
+        <th>Quantity pages</th>
+        <th>Quantity books</th>
+        <th>Edit</th>
+        <th>Delete</th>
+      </tr>          
+    </table>
+  </div>
+  <p>Most active visitors:</p>
+  <div class="list">
+    <table id="listVisitors">
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Phone</th>
+        <th>Edit</th>
+        <th>Delete</th>
+      </tr>          
+    </table>
+  </div>`;
+
+  return pageHTML;
+}
+
+function popularBooks(showQuantity){
+  let arrayObj = localStorage.getItem('books');
+  let books = [];
+
+  if (arrayObj != null){
+    books = JSON.parse(arrayObj);
+  }
+
+  if (books.length == 0){
+    let modal = document.getElementById('modal');
+    modal.innerHTML = createMessageBox('Message', 'The data array is empty');
+    modal.style.display = 'block';
+    
+    return;
+  }
+
+  books.sort((a, b) => b.rating - a.rating);
+
+  let counter = books.length < showQuantity ? books.length : showQuantity;
+
+  for (let i = 0; i < counter; i++){
+    addBookToTable(books[i].id, books[i].name, books[i].author, books[i].year, books[i].publishing, books[i].pages, books[i].quantity);
+  }
+}
+
+function activeVisitors(showQuantity){
+  let arrayObj = localStorage.getItem('visitors');
+  let visitors = [];
+
+  if (arrayObj != null){
+    visitors = JSON.parse(arrayObj);
+  }
+
+  if (visitors.length == 0){
+    let modal = document.getElementById('modal');
+    modal.innerHTML = createMessageBox('Message', 'The data array is empty');
+    modal.style.display = 'block';
+    
+    return;
+  }
+
+  visitors.sort((a, b) => b.rating - a.rating);
+
+  let counter = visitors.length < showQuantity ? visitors.length : showQuantity;
+
+  for (let i = 0; i < counter; i++){
+    addVisitorToTable(visitors[i].id, visitors[i].name, visitors[i].phone);
+  }
+}
+
 //=================================== GENERAL FUNCTIONS ==========================================
 
 function createMessageBox(titleMsg, textMsg){
@@ -1074,3 +1183,189 @@ function getLastId(keyStorage){
 
   return 1;
 }
+
+//=================================== BD ==========================================
+
+// function setVisitors(){
+//   visitors = [
+//     {
+//         "id": 2,
+//         "name": "Colette Kelley",
+//         "phone": "012 435 45 67",
+//         "rating": 12
+//     },
+//     {
+//         "id": 3,
+//         "name": "Ruby-Rose Lennon",
+//         "phone": "012 647 34 24",
+//         "rating": 1
+//     },
+//     {
+//         "id": 4,
+//         "name": "Leanne Gibbons",
+//         "phone": "012 879 78 45",
+//         "rating": 2
+//     },
+//     {
+//         "id": 5,
+//         "name": "Rumaisa Peel",
+//         "phone": "012 456 64 67",
+//         "rating": 1
+//     },
+//     {
+//         "id": 6,
+//         "name": "Gene Medrano",
+//         "phone": "012 245 47 89",
+//         "rating": 0
+//     },
+//     {
+//         "id": 7,
+//         "name": "Sheridan Tucker",
+//         "phone": "012 345 85 90",
+//         "rating": 0
+//     },
+//     {
+//         "id": 8,
+//         "name": "Christina Mack",
+//         "phone": "012 123 36 46",
+//         "rating": 0
+//     }
+//   ];
+
+//   localStorage.setItem('visitors', JSON.stringify(visitors));
+// }
+// setVisitors();
+
+// function setBooks(){
+//   books = [
+//     {
+//         "id": 1,
+//         "name": "Чистый код: создание, анализ и рефакторинг",
+//         "author": "Роберт Мартин",
+//         "year": "2019",
+//         "publishing": "СПб.: Питер",
+//         "pages": "500",
+//         "quantity": 3,
+//         "rating": 10
+//     },
+//     {
+//         "id": 2,
+//         "name": "Тур по C++",
+//         "author": "Bjarne Stroustrup",
+//         "year": "2022",
+//         "publishing": " Times and Helvetica",
+//         "pages": "314",
+//         "quantity": 4,
+//         "rating": 2
+//     },
+//     {
+//         "id": 3,
+//         "name": "Complete Guide to CSS Flex &amp; Grid - Vanilla CSS",
+//         "author": "Shruti Balasa",
+//         "year": "2021",
+//         "publishing": "online",
+//         "pages": "190",
+//         "quantity": 4,
+//         "rating": 2
+//     },
+//     {
+//         "id": 4,
+//         "name": "HTML и CSS: 25 уроков для начинающих",
+//         "author": "Дронов В.А.",
+//         "year": "2020",
+//         "publishing": "СПб.: БХВ-Питербург",
+//         "pages": "400",
+//         "quantity": "6",
+//         "rating": 0
+//     },
+//     {
+//         "id": 5,
+//         "name": "Шпаргалки для начинающего верстальщика HTML/CSS",
+//         "author": "Елена Эберт",
+//         "year": "2021",
+//         "publishing": "Ridero",
+//         "pages": "103",
+//         "quantity": 5,
+//         "rating": 1
+//     },
+//     {
+//         "id": 6,
+//         "name": "Как устроен JavaScript",
+//         "author": "Дуглас Крокфорд",
+//         "year": "2019",
+//         "publishing": " СПб.: Питер",
+//         "pages": "304",
+//         "quantity": 5,
+//         "rating": 1
+//     },
+//     {
+//         "id": 7,
+//         "name": "JavaScript.  Полное  руководство",
+//         "author": "Дэвид Флэнаган",
+//         "year": "2021",
+//         "publishing": "СПб.: Питер",
+//         "pages": "720",
+//         "quantity": "7",
+//         "rating": 0
+//     }
+//   ];
+
+//   localStorage.setItem('books', JSON.stringify(books));
+// }
+// setBooks();
+
+// function setCards(){
+//   cards = [
+//     {
+//         "id": 1,
+//         "visitor": "Colette Kelley",
+//         "book": "Чистый код: создание, анализ и рефакторинг",
+//         "idBook": "1",
+//         "borrowDate": "10.02.2024",
+//         "returnDate": "01.03.2024"
+//     },
+//     {
+//         "id": 2,
+//         "visitor": "Ruby-Rose Lennon",
+//         "book": "Тур по C++",
+//         "idBook": "2",
+//         "borrowDate": "01.03.2024",
+//         "returnDate": "12.03.2024"
+//     },
+//     {
+//         "id": 3,
+//         "visitor": "Leanne Gibbons",
+//         "book": "Complete Guide to CSS Flex &amp; Grid - Vanilla CSS",
+//         "idBook": "3",
+//         "borrowDate": "20.12.2023",
+//         "returnDate": "10.02.2024"
+//     },
+//     {
+//         "id": 4,
+//         "visitor": "Rumaisa Peel",
+//         "book": "Шпаргалки для начинающего верстальщика HTML/CSS",
+//         "idBook": "5",
+//         "borrowDate": "05.01.2024",
+//         "returnDate": "30.01.2024"
+//     },
+//     {
+//         "id": 5,
+//         "visitor": "Leanne Gibbons",
+//         "book": "Complete Guide to CSS Flex &amp; Grid - Vanilla CSS",
+//         "idBook": "3",
+//         "borrowDate": "25.2.2024",
+//         "returnDate": null
+//     },
+//     {
+//         "id": 6,
+//         "visitor": "Colette Kelley",
+//         "book": "Как устроен JavaScript",
+//         "idBook": "6",
+//         "borrowDate": "10.3.2024",
+//         "returnDate": null
+//     }
+//   ];
+
+//   localStorage.setItem('cards', JSON.stringify(cards));
+// }
+// setCards();
